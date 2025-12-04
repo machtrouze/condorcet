@@ -39,7 +39,7 @@ ET.SubElement(channel, "link").text = "https://prim.iledefrance-mobilites.fr"
 ET.SubElement(channel, "description").text = "Affichage du prochain horaire de passage (GMT+1)"
 
 # Extraire le prochain passage
-visits = data["Siri"]["ServiceDelivery"]["StopMonitoringDelivery"][0]["MonitoredStopVisit"][:1]
+visits = data["Siri"]["ServiceDelivery"]["StopMonitoringDelivery"][0]["MonitoredStopVisit"][:3]
 
 for visit in visits:
     call = visit["MonitoredVehicleJourney"]["MonitoredCall"]
