@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 
 # URL de l'API
-API_URL = "https://prim.iledefrance-mobilites.fr/fr/apis/idfm-ivtr-requete_unitaire/stop-monitoring"
+API_URL = "https://prim.iledefrance-mobilites.fr/marketplace/stop-monitoring"
 API_KEY = "VOTRE_CLE_API"  # Remplacez par votre clé API
 
 # Paramètres de la requête
