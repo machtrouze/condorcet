@@ -8,7 +8,7 @@ API_KEY = os.getenv("IDFM_API_KEY")
 if not API_KEY:
     raise Exception("Clé API manquante. Configurez le secret IDFM_API_KEY dans GitHub Actions.")
 
-API_URL = "https://prim.iledefrance-mobilites.fr/fr/apis/idfm-ivtr-requete_unitaire/stop-monitoring"
+API_URL = "https://prim.iledefrance-mobilites.fr/marketplace/stop-monitoring"
 params = {
     "MonitoringRef": "STIF:StopPoint:Q:7619:",
     "LineRef": "STIF:Line::C00317:"
