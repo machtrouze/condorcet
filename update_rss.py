@@ -1,6 +1,7 @@
+
 import requests
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 # Récupérer la clé API depuis les variables d'environnement
@@ -11,7 +12,7 @@ if not API_KEY:
 # URL de l'API
 API_URL = "https://prim.iledefrance-mobilites.fr/marketplace/stop-monitoring"
 
-# Paramètres de la requête (exemple : arrêt Condorcet)
+# Paramètres de la requête
 params = {
     "MonitoringRef": "STIF:StopPoint:Q:7619:",  # ID de l'arrêt
     "LineRef": "STIF:Line::C00317:"            # ID de la ligne (optionnel)
@@ -35,18 +36,21 @@ rss = ET.Element("rss", version="2.0")
 channel = ET.SubElement(rss, "channel")
 ET.SubElement(channel, "title").text = "Horaires Bus - Condorcet (3 prochains passages)"
 ET.SubElement(channel, "link").text = "https://prim.iledefrance-mobilites.fr"
-ET.SubElement(channel, "description").text = "Affichage des 3 prochains horaires de passage"
+ET.SubElement(channel, "description").text = "Affichage des 3 prochains horaires de passage (GMT+1)"
 
 # Extraire les 3 premiers passages
 visits = data["Siri"]["ServiceDelivery"]["StopMonitoringDelivery"][0]["MonitoredStopVisit"][:3]
 
 for visit in visits:
     call = visit["MonitoredVehicleJourney"]["MonitoredCall"]
-    heure_passage = datetime.fromisoformat(call["ExpectedArrivalTime"].replace("Z", "+00:00")).strftime("%H:%M")
+    destination = visit["MonitoredVehicleJourney"]['DestinationName'][0]['value']
+    # Convertir en datetime et ajouter +1 heure pour GMT+1
+    heure_passage = datetime.fromisoformat(call["ExpectedArrivalTime"].replace("Z", "+00:00")) + timedelta(hours=1)
+    heure_formatee = heure_passage.strftime("%H:%M")
 
     item = ET.SubElement(channel, "item")
-    ET.SubElement(item, "title").text = f"Passage prévu à {heure_passage}"
-    ET.SubElement(item, "description").text = f"Heure de passage : {heure_passage}"
+    ET.SubElement(item, "title").text = f"Passage prévu à {heure_formatee}"
+    ET.SubElement(item, "description").text = f"Vers {destination}"
     ET.SubElement(item, "pubDate").text = datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S GMT")
     ET.SubElement(item, "guid").text = call["ExpectedArrivalTime"]
 
@@ -55,4 +59,4 @@ rss_xml = ET.tostring(rss, encoding="utf-8", xml_declaration=True).decode("utf-8
 with open("horaires_bus.xml", "w", encoding="utf-8") as f:
     f.write(rss_xml)
 
-print("Flux RSS généré avec les 3 prochains passages (heures uniquement).")
+print("Flux RSS généré avec les 3 prochains passages (heures en GMT+1).")
