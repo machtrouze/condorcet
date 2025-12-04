@@ -8,44 +8,51 @@ API_KEY = os.getenv("IDFM_API_KEY")
 if not API_KEY:
     raise Exception("Clé API manquante. Configurez le secret IDFM_API_KEY dans GitHub Actions.")
 
+# URL de l'API
 API_URL = "https://prim.iledefrance-mobilites.fr/marketplace/stop-monitoring"
+
+# Paramètres de la requête (exemple : arrêt Condorcet)
 params = {
-    "MonitoringRef": "STIF:StopPoint:Q:7619:",
-    "LineRef": "STIF:Line::C00317:"
+    "MonitoringRef": "STIF:StopPoint:Q:7619:",  # ID de l'arrêt
+    "LineRef": "STIF:Line::C00317:"            # ID de la ligne (optionnel)
 }
+
+# Headers avec clé API
 headers = {
     "apikey": API_KEY,
     "Accept": "application/json"
 }
 
+# Appel API
 response = requests.get(API_URL, headers=headers, params=params)
 if response.status_code != 200:
     raise Exception(f"Erreur API: {response.status_code} - {response.text}")
 
 data = response.json()
 
+# Création du flux RSS
 rss = ET.Element("rss", version="2.0")
 channel = ET.SubElement(rss, "channel")
-ET.SubElement(channel, "title").text = "Horaires Bus - Condorcet"
+ET.SubElement(channel, "title").text = "Horaires Bus - Condorcet (3 prochains passages)"
 ET.SubElement(channel, "link").text = "https://prim.iledefrance-mobilites.fr"
-ET.SubElement(channel, "description").text = "Prochains passages à l'arrêt Condorcet"
+ET.SubElement(channel, "description").text = "Affichage des 3 prochains horaires de passage"
 
-visits = data["Siri"]["ServiceDelivery"]["StopMonitoringDelivery"][0]["MonitoredStopVisit"]
+# Extraire les 3 premiers passages
+visits = data["Siri"]["ServiceDelivery"]["StopMonitoringDelivery"][0]["MonitoredStopVisit"][:3]
+
 for visit in visits:
-    journey = visit["MonitoredVehicleJourney"]
-    call = journey["MonitoredCall"]
-    title = f"Bus vers {journey['DestinationName'][0]['value']} à {call['ExpectedArrivalTime']}"
-    description = f"Ligne {journey['LineRef']['value']} - Arrêt {call['StopPointName'][0]['value']}"
-    pub_date = datetime.fromisoformat(call["ExpectedArrivalTime"].replace("Z", "+00:00")).strftime("%a, %d %b %Y %H:%M:%S GMT")
+    call = visit["MonitoredVehicleJourney"]["MonitoredCall"]
+    heure_passage = datetime.fromisoformat(call["ExpectedArrivalTime"].replace("Z", "+00:00")).strftime("%H:%M")
 
     item = ET.SubElement(channel, "item")
-    ET.SubElement(item, "title").text = title
-    ET.SubElement(item, "description").text = description
-    ET.SubElement(item, "pubDate").text = pub_date
-    ET.SubElement(item, "guid").text = visit["ItemIdentifier"]
+    ET.SubElement(item, "title").text = f"Passage prévu à {heure_passage}"
+    ET.SubElement(item, "description").text = f"Heure de passage : {heure_passage}"
+    ET.SubElement(item, "pubDate").text = datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S GMT")
+    ET.SubElement(item, "guid").text = call["ExpectedArrivalTime"]
 
+# Sauvegarde du fichier RSS
 rss_xml = ET.tostring(rss, encoding="utf-8", xml_declaration=True).decode("utf-8")
 with open("horaires_bus.xml", "w", encoding="utf-8") as f:
     f.write(rss_xml)
 
-print("Flux RSS généré et sauvegardé dans horaires_bus.xml")
+print("Flux RSS généré avec les 3 prochains passages (heures uniquement).")
