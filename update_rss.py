@@ -38,8 +38,8 @@ ET.SubElement(channel, "title").text = "Horaires Bus - Condorcet (3 prochains pa
 ET.SubElement(channel, "link").text = "https://prim.iledefrance-mobilites.fr"
 ET.SubElement(channel, "description").text = "Affichage des 3 prochains horaires de passage (GMT+1)"
 
-# Extraire les 3 premiers passages
-visits = data["Siri"]["ServiceDelivery"]["StopMonitoringDelivery"][0]["MonitoredStopVisit"][:3]
+# Extraire le prochain passage
+visits = data["Siri"]["ServiceDelivery"]["StopMonitoringDelivery"][0]["MonitoredStopVisit"][:1]
 
 for visit in visits:
     call = visit["MonitoredVehicleJourney"]["MonitoredCall"]
@@ -49,8 +49,8 @@ for visit in visits:
     heure_formatee = heure_passage.strftime("%H:%M")
 
     item = ET.SubElement(channel, "item")
-    ET.SubElement(item, "title").text = f"Passage prévu à {heure_formatee}"
-    ET.SubElement(item, "description").text = f"Vers {destination}"
+    ET.SubElement(item, "title").text = f"Prochain bus vers {destination}"
+    ET.SubElement(item, "description").text = f"{heure_formatee}"
     ET.SubElement(item, "pubDate").text = datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S GMT")
     ET.SubElement(item, "guid").text = call["ExpectedArrivalTime"]
 
