@@ -5,7 +5,7 @@ from datetime import datetime
 
 # URL de l'API
 API_URL = "https://prim.iledefrance-mobilites.fr/marketplace/stop-monitoring"
-API_KEY = "VOTRE_CLE_API"  # Remplacez par votre clé API
+API_KEY = "MafBsCnSdWAmpGWbUMgZLJD7TECqI8XU"  # Remplacez par votre clé API
 
 # Paramètres de la requête
 params = {
