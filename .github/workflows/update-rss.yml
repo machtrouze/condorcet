@@ -1,6 +1,9 @@
 
 name: Update RSS Feed
 
+permissions:
+  contents: write
+
 on:
   schedule:
     - cron: "* * * * *"  # Exécution toutes les 30 minutes
