@@ -1,2 +1,2 @@
 <?xml version='1.0' encoding='utf-8'?>
-<rss version="2.0"><channel><title>Horaires Bus - Condorcet</title><link>https://prim.iledefrance-mobilites.fr</link><description>Affichage du prochain horaire de passage (GMT+1)</description></channel></rss>
+<rss version="2.0"><channel><title>Horaires Bus - Condorcet</title><link>https://prim.iledefrance-mobilites.fr</link><description>Affichage du prochain horaire de passage (GMT+1)</description><item><title>Prochain bus à 06:42</title><description>vers Lycée Les Pierres Vives</description><pubDate>Fri, 05 Dec 2025 05:42:04 GMT</pubDate><guid>2025-12-05T05:42:50.000Z</guid></item></channel></rss>
